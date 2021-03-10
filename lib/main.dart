@@ -11,53 +11,20 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  Future<int> bouk(int a,int b){
-    int h=a+b;
-    return Future.value(h);
-  }
-  void sayHello(name){
-    print("Hello $name");
-  }
-  Future sayHi(name){
-    print("Hi $name");
-  }
-  Future sum(int a,int b){
-    print("$a + $b = ${a+b}");
-  }
   Future<int> add(int a,int b){
-    return Future.value(a+b);
+    return Future.delayed(Duration(milliseconds:10000),()=>a+b);
   }
-  Future<double> mulDiv({num1,num2,num3}){
-    int a=num1+num2;
-    double b=a/num3;
-    return Future.value(b);
-  }
-
-  Future<double> div1(double a,double b){
-    double c=a*b;
-    return Future.value(c);
-  }
-  _initWork()async{
-    int buklek=await bouk(1000, 3000);
-    print(buklek);
-    double result=await div1(20, 60);
-    print("hadlfj is $result");
-    sayHello("vengeang");
-    int r=await add(10,30);
-    print("re is $r");
-    sayHi("vengeang");
-    sum(10, 20);
-    add(20, 30).then((value) => print(value));
-    mulDiv(num1: 10,num2: 20,num3: 30).then((value) {
-      print("Result is $value");
+  Future<String> someFunction(name){
+    Future<String> myName=Future.delayed(Duration(seconds: 3),(){
+      return "Hello $name";
     });
-}
+    return myName;
+  }
 
 
   @override
   void initState() {
     super.initState();
-    _initWork();
   }
 
   @override
@@ -66,12 +33,68 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text("OOP is hard"),
+          title: Text("Lavel 2"),
           centerTitle: true,
         ),
-        body: Container(),
+        body: _buildBody2,
+    ),
+    );
+  }
+  get _buildBody{
+    return Container(
+      alignment: Alignment.center,
+      child: FutureBuilder(
+        future: add(10, 20),
+        builder: (context,snapshot){
+          if(snapshot.hasError)
+            return Center(
+                child: Text("Error = ${snapshot.error}",
+                  style: TextStyle(fontSize: 30),
+                )
+            );
+          else{
+            if(snapshot.connectionState==ConnectionState.done){
+              return Center(
+                child: Text(
+                  "Data = ${snapshot.data}",
+                  style: TextStyle(fontSize: 30),
+                ),
+              );
+            }
+            else{
+              // return CircularProgressIndicator();
+              return Text("Loading....");
+            }
+          }
+        },
       ),
     );
-
+  }
+  get _buildBody2{
+    return Container(
+      color: Colors.blue,
+      // alignment: Alignment.center,
+      child: FutureBuilder(
+        future: someFunction("veng eang"),
+        builder: (context,snapshot){
+          if(snapshot.hasError){
+            return Center(
+              child: Text("Error = ${snapshot.hasError}",
+              style: TextStyle(fontSize: 30),),
+            );
+          }
+          else{
+            if(snapshot.connectionState==ConnectionState.done)
+              return Center(
+                child: Text("Data : ${snapshot.data}",
+                style: TextStyle(fontSize: 30),),
+              );
+            else{
+              return Center(child: CircularProgressIndicator(backgroundColor: Colors.black,));
+            }
+          }
+        },
+      ),
+    );
   }
 }
